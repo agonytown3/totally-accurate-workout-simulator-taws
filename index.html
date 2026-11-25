@@ -3,16 +3,404 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>My App</title>
+  <title>Totally Accurate Workout Simulator</title>
   <link rel="icon" href="data:,">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <main>
-    <h1>My App</h1>
-    <p class="tagline">Built at the Computhink AI Coding Camp.</p>
+  <main class="app-shell">
+    <section id="panorama" class="panorama" aria-label="Changing workout panorama">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">WORKOUT HQ</p>
+          <h1>Totally Accurate Workout Simulator</h1>
+        </div>
+        <div class="header-actions">
+          <label class="language-control">Language
+            <select id="languageSelect">
+              <option value="en">English</option>
+              <option value="zh">Chinese</option>
+              <option value="es">Spanish</option>
+              <option value="de">German</option>
+              <option value="hi">Hindi</option>
+              <option value="ar">Arabic</option>
+              <option value="fr">Français</option>
+              <option value="ja">日本語</option>
+              <option value="ru">Русский</option>
+              <option value="id">Bahasa Indonesia</option>
+              <option value="tlh">Klingon (tlhIngan Hol)</option>
+            </select>
+          </label>
+          <div class="rank-card" aria-label="Level progress">
+            <span id="rankName">Rookie</span>
+            <div class="rank-track"><div id="rankFill" class="rank-fill"></div></div>
+            <span id="rankText">0 / 100 XP</span>
+            <button id="resetRank" class="rank-reset" type="button">Reset rank</button>
+          </div>
+        </div>
+      </header>
+      <button id="bannerNext" class="banner-next" type="button" aria-label="Change panorama">Change view</button>
+    </section>
 
-    <!-- Your app goes here. Build it one Must at a time with Copilot. -->
+    <nav class="tabs" aria-label="App sections">
+      <button class="tab active" data-tab="plan">My Plan</button>
+      <button class="tab" data-tab="learn">Exercise Guide</button>
+      <button class="tab" data-tab="workout">Workout</button>
+      <button class="tab" data-tab="minigames">Mini Games</button>
+      <button class="tab" data-tab="places">Places</button>
+      <button class="tab" data-tab="goals">Goals</button>
+      <button class="tab" data-tab="health">Health Risks</button>
+      <button class="tab" data-tab="settings">Settings</button>
+    </nav>
+
+    <section id="plan" class="panel active">
+      <div class="grid-two">
+        <form id="profileForm" class="card">
+          <h2>Build your plan</h2>
+          <p class="muted">Optional inputs. Everything stays on this device.</p>
+          <div class="field-grid">
+            <label>Age <input id="age" type="number" min="10" max="100" placeholder="For example 14"></label>
+            <label>Height (cm) <input id="height" type="number" min="100" max="230" placeholder="170"></label>
+            <label>Weight (kg) <input id="weight" type="number" min="25" max="300" placeholder="60"></label>
+            <label>Current activity
+              <select id="activity">
+                <option value="low">Mostly inactive</option>
+                <option value="medium" selected>Some activity</option>
+                <option value="high">Very active</option>
+              </select>
+            </label>
+            <label>Goal
+              <select id="goal">
+                <option value="fitness">General fitness</option>
+                <option value="strength">Build strength</option>
+                <option value="endurance">Build endurance</option>
+              </select>
+            </label>
+            <label>Suggested session length
+              <select id="minutes">
+                <option value="5">5 minutes</option>
+                <option value="10">10 minutes</option>
+                <option value="15">15 minutes</option>
+                <option value="20">20 minutes</option>
+                <option value="25" selected>25 minutes</option>
+                <option value="30">30 minutes</option>
+                <option value="40">40 minutes</option>
+                <option value="45">45 minutes</option>
+                <option value="60">60 minutes</option>
+              </select>
+            </label>
+          </div>
+          <button class="primary" type="submit">Create My Plan</button>
+        </form>
+
+        <aside class="card results" aria-live="polite">
+          <h2>Your plan</h2>
+          <div id="emptyPlan" class="empty-state">
+            <div class="pulse-dot"></div>
+            <p>Add a few details and create a starter plan.</p>
+          </div>
+          <div id="planResult" hidden></div>
+          <button id="deletePlan" class="secondary" type="button" hidden>Delete plan</button>
+        </aside>
+      </div>
+      <p class="disclaimer">General fitness information only. This app cannot predict illnesses or lifespan. Ask a parent or trusted health professional before starting a new routine.</p>
+    </section>
+
+    <section id="learn" class="panel">
+      <div class="card">
+        <h2>How to move safely</h2>
+        <div class="exercise-grid" id="exerciseGrid"></div>
+      </div>
+      <div class="card stunt-section">
+        <h2>Stunts & flips</h2>
+        <p class="muted">Flips and aerials can cause severe injury. Learn only with a qualified coach, proper mats, and guardian approval—never practise from a video alone.</p>
+        <div class="exercise-grid" id="stuntGrid"></div>
+      </div>
+      <div class="card video-review-card">
+        <h2>Review a practice video</h2>
+        <p>Choose a video from this device or record a short clip with your camera, then play it back here.</p>
+        <p class="video-privacy">Your video stays in this page on this device. It is not uploaded or saved. This app does not have AI video analysis, so ask a qualified coach to check your technique.</p>
+        <label for="videoFileInput">Choose a video from this device
+          <input id="videoFileInput" type="file" accept="video/*">
+        </label>
+        <div class="video-controls">
+          <button id="cameraStart" class="secondary" type="button">Use camera</button>
+          <button id="recordStart" class="primary" type="button" disabled>Start recording</button>
+          <button id="recordStop" class="secondary" type="button" disabled>Stop recording</button>
+          <button id="cameraStop" class="secondary" type="button" disabled>Stop camera</button>
+          <button id="videoClear" class="secondary" type="button" disabled>Clear video</button>
+        </div>
+        <video id="videoPreview" controls playsinline hidden></video>
+        <p id="videoStatus" class="video-status" role="status" aria-live="polite">Choose a clip or start the camera. Camera access needs your permission.</p>
+      </div>
+    </section>
+
+    <section id="workout" class="panel">
+      <div class="grid-two workout-layout">
+        <div class="card workout-card">
+          <p class="eyebrow">EXERCISE TIMER</p>
+          <h2 id="workoutTitle">Time one exercise at a time</h2>
+          <label>Exercise to time
+            <select id="workoutExercise" disabled>
+              <option value="">Create a plan first</option>
+            </select>
+          </label>
+          <label>Time for this exercise
+            <select id="exerciseDuration" disabled>
+              <option value="30">30 seconds</option>
+              <option value="60">1 minute</option>
+              <option value="120" selected>2 minutes</option>
+              <option value="180">3 minutes</option>
+              <option value="300">5 minutes</option>
+              <option value="600">10 minutes</option>
+            </select>
+          </label>
+          <p id="exerciseRecommendation" class="exercise-recommendation" hidden>
+            <span><strong>Recommended exercise time:</strong> <span id="recommendedExerciseTime"></span></span>
+            <span><strong>Recommended rest:</strong> <span id="recommendedRestTime"></span></span>
+          </p>
+          <div class="timer" id="timer">00:00</div>
+          <div class="progress-track"><div id="workoutFill" class="progress-fill"></div></div>
+          <p id="workoutStatus">Create a plan to choose an exercise.</p>
+          <div class="button-row">
+            <button id="startWorkout" class="primary" type="button" disabled>Start</button>
+            <button id="pauseWorkout" class="secondary" type="button" disabled>Pause</button>
+            <button id="resetWorkout" class="secondary" type="button" disabled>Reset</button>
+          </div>
+          <div class="stopwatch-panel">
+            <h3>Stopwatch</h3>
+            <div class="timer stopwatch-display" id="stopwatchDisplay" role="timer" aria-label="Stopwatch">00:00</div>
+            <div class="button-row">
+              <button id="stopwatchStart" class="primary" type="button">Start</button>
+              <button id="stopwatchPause" class="secondary" type="button" disabled>Pause</button>
+              <button id="stopwatchReset" class="secondary" type="button">Reset</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>Coach & sounds</h2>
+          <label>Ambient sound
+            <select id="soundType">
+              <option value="off">Off</option>
+              <option value="rain">Soft rain</option>
+              <option value="ocean">Ocean waves</option>
+              <option value="forest">Forest ambience</option>
+              <option value="wind">Wind</option>
+              <option value="battlefield">Distant battlefield ambience (wind only)</option>
+              <option value="coffee">Cafe ambience</option>
+              <option value="music">Ambient music</option>
+            </select>
+          </label>
+          <button id="soundToggle" class="secondary">Play sound</button>
+          <p id="soundStatus" class="sound-status" role="status" aria-live="polite">Choose a sound and press play. Internet is needed.</p>
+          <p class="sound-credit">Rain and wind recordings by Robert EA Harvey, shared under
+            <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener">CC BY-SA 4.0</a>
+            (<a href="https://commons.wikimedia.org/wiki/File:Bourne_woods_rain_2020-05-10_0804.mp3" target="_blank" rel="noopener">rain source</a>,
+            <a href="https://commons.wikimedia.org/wiki/File:Wind_sounds_2020-05-10_1625.mp3" target="_blank" rel="noopener">wind source</a>).
+          </p>
+          <p class="sound-credit">The battlefield-style option uses wind ambience only. It has no weapon or explosion sounds.</p>
+          <div class="coach-box" aria-live="polite">
+            <strong>Coach tip</strong>
+            <p id="coachTip" role="status">Keep a pace that lets you still speak in short sentences.</p>
+          </div>
+          <button id="coachNext" class="secondary">Next tip</button>
+        </div>
+      </div>
+
+    </section>
+
+    <section id="minigames" class="panel">
+      <div class="card">
+        <h2>Mini games</h2>
+        <p>Use the mouse, touch, or arrow keys where shown. The mascot has a tip for each game.</p>
+      </div>
+      <div class="game-grid">
+        <article class="card game-card">
+          <h3>Dino runner</h3>
+          <canvas id="dinoCanvas" width="320" height="150" aria-label="Dino runner game"></canvas>
+          <p id="dinoScore">Score: 0</p>
+          <button id="dinoStart" class="primary">Start / Jump</button>
+          <p class="mascot-tip">Mascot Max: Press start, then jump over each cactus.</p>
+        </article>
+        <article class="card game-card">
+          <h3>Cloud Glider</h3>
+          <canvas id="gliderCanvas" width="320" height="190" aria-label="Cloud Glider game"></canvas>
+          <p id="gliderScore">Score: 0</p>
+          <p id="gliderStatus" aria-live="polite">Tap or press Space to glide through the gates.</p>
+          <button id="gliderStart" class="primary" type="button">Start / Glide</button>
+          <p class="mascot-tip">Mascot Max: Tap, click, or press Space to rise through the cloud gates.</p>
+        </article>
+        <article class="card game-card">
+          <h3>Snake</h3>
+          <canvas id="snakeCanvas" width="320" height="320" aria-label="Snake minigame"></canvas>
+          <p id="snakeScore">Score: 0</p>
+          <p id="snakeStatus" aria-live="polite">Collect food. The wall and your own tail end the game.</p>
+          <button id="snakeStart" class="primary">Start snake</button>
+          <p class="mascot-tip">Mascot Max: Use arrow keys or WASD. Do not cross your own trail.</p>
+        </article>
+        <article class="card game-card">
+          <h3>Aim trainer</h3>
+          <canvas id="aimCanvas" width="320" height="320" aria-label="Aim trainer game"></canvas>
+          <p id="aimScore">Score: 0 / 20</p>
+          <button id="aimStart" class="primary">Start aim trainer</button>
+          <p class="mascot-tip">Mascot Max: Tap the glowing targets quickly, but stay relaxed.</p>
+        </article>
+        <article class="card game-card">
+          <h3>Minesweeper</h3>
+          <p id="mineStatus" aria-live="polite">Find the safe squares. Numbers show nearby mines.</p>
+          <div id="mineBoard" class="mine-board" role="grid" aria-label="Minesweeper board"></div>
+          <p id="mineScore">Score: 0</p>
+          <div class="game-buttons">
+            <button id="mineMode" class="secondary" type="button">Flag mode: off</button>
+            <button id="mineRestart" class="primary" type="button">New board</button>
+          </div>
+          <p class="mascot-tip">Mascot Max: Tap to reveal; turn on flag mode to mark a suspected mine.</p>
+        </article>
+        <article class="card game-card">
+          <h3>Retro maze</h3>
+          <canvas id="pacCanvas" width="320" height="320" aria-label="Original retro maze game"></canvas>
+          <p id="pacScore">Score: 0</p>
+          <button id="pacStart" class="primary" type="button">Start maze</button>
+          <p id="pacStatus" aria-live="polite">Use arrow keys or WASD to collect dots and avoid the ghost.</p>
+          <p class="mascot-tip">Mascot Max: Use arrow keys or WASD. Collect all the dots and watch for the ghost.</p>
+        </article>
+        <article class="card game-card">
+          <h3>Baseball batting</h3>
+          <canvas id="baseballCanvas" width="320" height="210" aria-label="Baseball batting timing game"></canvas>
+          <p id="baseballScore">Runs: 0 | Hits: 0 / 10</p>
+          <p id="baseballStatus" aria-live="polite">Start a game, then swing when the pitch reaches the plate.</p>
+          <div class="game-buttons">
+            <button id="baseballPitch" class="primary" type="button">Start game</button>
+            <button id="baseballSwing" class="secondary" type="button" disabled>Swing!</button>
+          </div>
+          <p class="mascot-tip">Mascot Max: Time your swing as the ball reaches the batter. Space also swings.</p>
+        </article>
+        <article class="card game-card reaction-game">
+          <h3>Reaction time</h3>
+          <p>When the button turns green, tap it as quickly as you can.</p>
+          <p id="reactionScore">Score: 0</p>
+          <button id="reactionButton" class="reaction" disabled>Wait...</button>
+          <p id="reactionResult">Start a round to test your reaction.</p>
+          <button id="reactionStart" class="secondary">Start round</button>
+          <p class="mascot-tip">Mascot Max: Wait for green. Tapping early ends the round.</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="places" class="panel">
+      <div class="card places-card">
+        <h2>Find places nearby</h2>
+        <p>Search food places, gyms, malls, arcades, parks, or another place by typing an area.</p>
+        <form id="placesForm" class="places-form">
+          <label>What are you looking for?
+            <select id="placesCategory">
+              <option value="restaurants">Food places and restaurants</option>
+              <option value="gyms">Gyms</option>
+              <option value="shopping malls">Malls</option>
+              <option value="arcades">Arcades</option>
+              <option value="parks">Parks</option>
+              <option value="other">Other places</option>
+            </select>
+          </label>
+          <label>Another kind of place (optional)
+            <input id="placesInterest" type="text" maxlength="80" placeholder="For example: bookshops or bowling">
+          </label>
+          <label>Area, town, or landmark
+            <input id="placesArea" type="text" maxlength="100" placeholder="Type an area to search" required>
+          </label>
+          <button class="primary" type="submit">Prepare map search</button>
+        </form>
+        <div id="placesResults" class="places-results" hidden aria-live="polite">
+          <p id="placesMessage">Your search is ready.</p>
+          <a id="placesLink" class="primary map-link" href="#" target="_blank" rel="noopener">Open results in Google Maps</a>
+        </div>
+        <p class="places-privacy">Opening the map sends your search words to Google Maps. This app does not use GPS or save your search.</p>
+      </div>
+    </section>
+
+    <section id="goals" class="panel">
+      <div class="card">
+        <h2>Task manager</h2>
+        <form id="goalForm" class="goal-form">
+          <input id="goalInput" type="text" maxlength="80" placeholder="Example: Drink water after school" required>
+          <button class="primary" type="submit">Add goal</button>
+        </form>
+        <ul id="goalList" class="goal-list"></ul>
+      </div>
+    </section>
+
+    <section id="health" class="panel">
+      <div class="card">
+        <h2>Health, illness & injury risks</h2>
+        <p>Exercise can help many people, but it is not a replacement for medical advice. Stop and get help for chest pain, fainting, severe breathing trouble, or pain after injury.</p>
+        <div class="health-grid">
+          <article class="risk-card">
+            <h3>Sprains & strains</h3>
+            <p>Sudden twisting or poor form can hurt muscles or ligaments. Rest, use the safe RICE steps if appropriate, and ask a health professional if pain is strong or lasting.</p>
+          </article>
+          <article class="risk-card">
+            <h3>Overtraining</h3>
+            <p>Too much exercise can cause tiredness, poor sleep, soreness, and lower performance. Include rest days and easier sessions.</p>
+          </article>
+          <article class="risk-card">
+            <h3>Heat illness</h3>
+            <p>Hot environments can cause dehydration or heat illness. Drink water, rest in shade, and stop for headache, confusion, vomiting, or weakness.</p>
+          </article>
+          <article class="risk-card">
+            <h3>Head or neck injury</h3>
+            <p>Flips and gymnastic moves can cause serious injury. Never practice without trained supervision, correct equipment, and landing mats.</p>
+          </article>
+          <article class="risk-card">
+            <h3>When to get help</h3>
+            <p>Contact emergency services for severe symptoms. Ask a parent or trusted health professional before exercise if you have a heart, joint, breathing, or long-term condition.</p>
+          </article>
+          <article class="risk-card">
+            <h3>Life expectancy</h3>
+            <p>This app cannot responsibly predict lifespan. Genetics, environment, medical history, and luck all matter. It does not estimate illness risk or predict a future diagnosis.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="settings" class="panel">
+      <div class="card settings-card">
+        <h2>Settings</h2>
+        <label>Page shade
+          <select id="shadeSelect">
+            <option value="day">Day</option>
+            <option value="sunset">Sunset</option>
+            <option value="night">Night</option>
+            <option value="auto">Match the time</option>
+          </select>
+        </label>
+        <label>Accent color
+          <input id="accentInput" type="color" value="#1877a8">
+        </label>
+        <label>Page zoom
+          <input id="zoomInput" type="range" min="80" max="120" step="5" value="100">
+        </label>
+        <output id="zoomValue" for="zoomInput" aria-live="polite">100%</output>
+        <button id="resetTheme" class="secondary" type="button">Reset colors</button>
+      </div>
+    </section>
+
+    <aside id="mascot" class="mascot" aria-label="Mascot helper">
+      <div class="mascot-face" aria-hidden="true">
+        <svg viewBox="0 0 64 64" focusable="false">
+          <path d="M13 18 Q16 9 26 12 Q36 5 43 14 Q55 13 54 25 Q61 34 52 41 Q52 53 40 52 Q31 60 23 52 Q11 54 11 43 Q3 35 11 27 Q7 21 13 18Z" fill="#67d5b5" stroke="#146b70" stroke-width="3" stroke-linejoin="round"/>
+          <ellipse cx="25" cy="30" rx="3.3" ry="4.3" fill="#12355b"/>
+          <ellipse cx="40" cy="29" rx="3.3" ry="4.3" fill="#12355b"/>
+          <path d="M25 40 Q32 46 41 39" fill="none" stroke="#12355b" stroke-width="3" stroke-linecap="round"/>
+          <circle cx="18" cy="37" r="2.5" fill="#ff9a8b"/>
+          <circle cx="47" cy="36" r="2.5" fill="#ff9a8b"/>
+        </svg>
+      </div>
+      <div class="mascot-message">
+        <strong>Mascot Max</strong>
+        <p id="mascotText">Welcome! I can explain the exercises and mini games.</p>
+      </div>
+    </aside>
   </main>
 
   <script src="script.js"></script>
